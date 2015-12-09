@@ -12,25 +12,17 @@ object NiceWords{
 
   def doubleChar(s: String): Boolean = {
     val regexp = """([a-z])\1{1}""".r
-    checkRegexp(s, regexp)
+    regexp.findFirstIn(s).isDefined
   }
 
   def threeVowel(s: String): Boolean = {
     val regexp = """.*[aeiou].*[aeiou].*[aeiou].*""".r
-    checkRegexp(s, regexp)
+    regexp.findFirstIn(s).isDefined
   }
 
   def notBanned(s: String): Boolean = {
     val regexp = """(ab|cd|pq|xy)""".r
-    !checkRegexp(s, regexp)
+    !regexp.findFirstIn(s).isDefined
   }
-
-  def checkRegexp(s: String, regexp: scala.util.matching.Regex): Boolean = {
-    regexp findFirstIn s match {
-      case Some(_) => true
-      case _ => false
-    }
-  }
-
 
 }
