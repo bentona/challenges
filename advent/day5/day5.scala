@@ -7,7 +7,7 @@ object NiceWords{
   }
 
   def isValid(s: String): Boolean = {
-    doubleChar(s) && threeVowel(s) && notBanned(s)
+    twicePair(s) && spaceDouble(s)
   }
 
   def doubleChar(s: String): Boolean = {
@@ -17,6 +17,16 @@ object NiceWords{
 
   def threeVowel(s: String): Boolean = {
     val regexp = """.*[aeiou].*[aeiou].*[aeiou].*""".r
+    regexp.findFirstIn(s).isDefined
+  }
+
+  def twicePair(s: String): Boolean = {
+    val regexp = """([a-z][a-z]).*\1{1}""".r
+    regexp.findFirstIn(s).isDefined
+  }
+
+  def spaceDouble(s: String): Boolean = {
+    val regexp = """([a-z]).\1{1}""".r
     regexp.findFirstIn(s).isDefined
   }
 
