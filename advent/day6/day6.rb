@@ -10,12 +10,6 @@ class FireGrid
     lines.each{|line| parse_line(line) }
   end
 
-  def render
-    @arr.each do |row|
-      puts row.join(",")
-    end
-  end
-
   def parse_line(line)
     rect = extract_rect(line)
     case
@@ -47,7 +41,7 @@ class FireGrid
   end
 
   def turn_off(coords)
-    change(coords, -> (n){ [n-1,0].min } )
+    change(coords, -> (n){ [n-1,0].max } )
   end
 
   def toggle(coords)
