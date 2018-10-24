@@ -1,5 +1,4 @@
 class NormalUpdater
-  QUALITY_CHANGE = -1
   QUALITY_MIN = 0
 
   def quality_max
