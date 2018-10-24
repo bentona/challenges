@@ -1,56 +1,108 @@
+class NormalUpdater
+  QUALITY_CHANGE = -1
+  QUALITY_MIN = 0
+
+  def quality_max
+    50
+  end
+
+  def quality_change
+    -1
+  end
+
+  def initialize(item)
+    @item = item
+  end
+
+  def update
+    @item.sell_in -= 1
+    @item.quality = new_quality_value
+  end
+
+  def delta
+    value = quality_change
+    value += quality_change if @item.sell_in <= 0
+    value
+  end
+
+  def new_quality_value
+    value = [QUALITY_MIN, @item.quality + delta].max
+    [value, quality_max].min
+  end
+end
+
+class BrieUpdater < NormalUpdater
+  QUALITY_CHANGE = 1
+
+  def quality_change
+    1
+  end
+
+end
+
+class SulfurasUpdater < NormalUpdater
+  def quality_change
+    0
+  end
+
+  def quality_max
+    80
+  end
+end
+
+class BackstagePassUpdater < NormalUpdater
+  
+  def new_quality_value
+    return 0 if @item.sell_in <= 0
+    return 50 if @item.quality >= 50
+    if @item.sell_in >= 10
+      @item.quality + 1
+    elsif @item.sell_in >= 5
+      @item.quality + 2
+    else
+      @item.quality + 3
+    end
+  end
+end
+
+class ConjuredUpdater < NormalUpdater
+  def quality_change
+    -2
+  end
+end
+
+
 class GildedRose
 
   def initialize(items)
     @items = items
   end
-
+  
   def update_quality()
-    @items.each do |item|
-      if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert"
-        if item.quality > 0
-          if item.name != "Sulfuras, Hand of Ragnaros"
-            item.quality = item.quality - 1
-          end
-        end
-      else
-        if item.quality < 50
-          item.quality = item.quality + 1
-          if item.name == "Backstage passes to a TAFKAL80ETC concert"
-            if item.sell_in < 11
-              if item.quality < 50
-                item.quality = item.quality + 1
-              end
-            end
-            if item.sell_in < 6
-              if item.quality < 50
-                item.quality = item.quality + 1
-              end
-            end
-          end
-        end
-      end
-      if item.name != "Sulfuras, Hand of Ragnaros"
-        item.sell_in = item.sell_in - 1
-      end
-      if item.sell_in < 0
-        if item.name != "Aged Brie"
-          if item.name != "Backstage passes to a TAFKAL80ETC concert"
-            if item.quality > 0
-              if item.name != "Sulfuras, Hand of Ragnaros"
-                item.quality = item.quality - 1
-              end
-            end
-          else
-            item.quality = item.quality - item.quality
-          end
-        else
-          if item.quality < 50
-            item.quality = item.quality + 1
-          end
-        end
-      end
+    @items.map do |item|
+      update_item(item)
     end
   end
+
+  def update_item(item)
+    updater = updater(item).new(item).update
+  end
+
+  def updater(item)  
+    case item.name
+    when "Aged Brie"
+      return BrieUpdater
+    when "Sulfuras, Hand of Ragnaros"
+      return SulfurasUpdater
+    when "Backstage passes to a TAFKAL80ETC concert"
+      return BackstagePassUpdater
+    when "Conjured Mana Cake"
+      return ConjuredUpdater
+    else
+      return NormalUpdater
+    end
+  end
+
 end
 
 class Item
